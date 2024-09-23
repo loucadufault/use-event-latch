@@ -1,0 +1,51 @@
+{
+  "name": "use-event-latch",
+  "version": "0.0.1",
+  "description": "React hook to derive state from events emitted by an EventEmitter",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/wrapper.mjs",
+  "esnext": "dist/esm/wrapper.mjs",
+  "keywords": [
+    "react",
+    "hook",
+    "event emitter",
+    "event-emitter",
+    "eventemitter",
+    "webpack",
+    "browserify"
+  ],
+  "author": "Louca Dufault",
+  "license": "ISC",
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "src/",
+    "dist/"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "build": "mkdir -p dist/cjs && cp -r public/esm dist/ && tsc -p tsconfig.build.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.x"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@types/events": "^3.0.3",
+    "typed-emitter": "^2.1.0"
+  }
+}
