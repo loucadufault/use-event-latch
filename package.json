@@ -1,6 +1,6 @@
 {
   "name": "use-event-latch",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React hook to derive state from events emitted by an EventEmitter",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/wrapper.mjs",
@@ -28,6 +28,7 @@
     "url": "git+https://github.com/loucadufault/use-event-latch.git"
   },
   "scripts": {
+    "prepublish": "npm run build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "build": "mkdir -p dist/cjs && cp -r public/esm dist/ && tsc -p tsconfig.build.json",
