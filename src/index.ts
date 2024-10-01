@@ -4,20 +4,19 @@ import { useEffect, useState } from 'react'
 export type EventHandler = (...args: unknown[]) => string
 export type EventConfig = string[] | Record<string, EventHandler | string>
 
-
 /**
  * Register listeners on an EventEmitter to derive state from the emitted events.
- * 
+ *
  * @param eventEmitter - the EventEmitter instance to listen to
  * @param eventConfig - an optional configuration object specifying how the emitted events will participate in setting the return value. Possible values are:
  * - omitted (default): the return value is the last emitted event name among all event names (as given by {@link EventEmitter#eventNames})
  * - an array of event names: the return value is the last emitted event name among those event names (only)
  * - a record with keys the event names
- * 
+ *
  * For each event name in the record, the value can be:
  * - a string which will be used as the return value
  * - a function returning a string which will be used as the return value
- * 
+ *
  * Function values are called with the emitted args (as if directly registered as a listener for the event).
  * @returns the latest emitted event name, or a value derived from the emitted event and args according to the {@link eventConfig}
  */
