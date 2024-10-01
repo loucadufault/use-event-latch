@@ -1,1 +1,1 @@
-export { useEventLatch } from '../cjs/index'
+export { useEventLatch } from '../cjs/index.js'
