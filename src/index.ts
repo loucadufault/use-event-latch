@@ -1,18 +1,9 @@
-import type { EventEmitter } from 'events'
+import { EventEmitter } from 'events'
 import { useEffect, useState } from 'react'
-import TypedEmitter, { EventMap } from 'typed-emitter'
 
-type KeysWithValsOfType<T,V> = keyof { [ P in keyof T as T[P] extends V ? P : never ] : P };
+export type EventHandler = (...args: unknown[]) => string
+export type EventConfig = string[] | Record<string, EventHandler | string>
 
-export type EventConfig<TEventMap extends EventMap, TSelectedEvent extends keyof TEventMap, TResult extends string> = (keyof TEventMap)[] | RecordEventConfig<TEventMap, TSelectedEvent, TResult>
-
-type RecordEventConfig<TEventMap extends EventMap, TSelectedEvent extends keyof TEventMap, TResult extends string = never> = 
-{
-  [k in Exclude<keyof TEventMap, TSelectedEvent>]: ((...args: Parameters<TEventMap[k]>) => false | TResult) | TResult
-} 
-// & {
-//   [k in TSelectedEvent]: (...args: Parameters<TEventMap[k]>) => true
-// }
 
 /**
  * Register listeners on an EventEmitter to derive state from the emitted events.
@@ -25,24 +16,15 @@ type RecordEventConfig<TEventMap extends EventMap, TSelectedEvent extends keyof 
  * 
  * For each event name in the record, the value can be:
  * - a string which will be used as the return value
- * - a function returning boolean which determines whether the return value should take the value of the event name
  * - a function returning a string which will be used as the return value
  * 
  * Function values are called with the emitted args (as if directly registered as a listener for the event).
  * @returns the latest emitted event name, or a value derived from the emitted event and args according to the {@link eventConfig}
  */
-// export function useEventLatch<TEventMap extends EventMap, TEvents extends keyof TEventMap>(
-//   eventEmitter: TypedEmitter<TEventMap>,
-//   eventConfig: TEvents[],
-// ): TEvents
-export function useEventLatch<TEventMap extends EventMap, TSelectedEvent extends keyof TEventMap, TResult extends string = never>(
-  eventEmitter: TypedEmitter<TEventMap>,
-  eventConfig: RecordEventConfig<TEventMap, TSelectedEvent, TResult>
-): TSelectedEvent | TResult | null
-export function useEventLatch<TEventMap extends EventMap, TSelectedEvent extends keyof TEventMap, TResult extends string = never>(
-  eventEmitter: TypedEmitter<TEventMap>,
-  eventConfig?: RecordEventConfig<TEventMap, TSelectedEvent, TResult>,
-): TSelectedEvent | TResult | null {
+export const useEventLatch = (
+  eventEmitter: EventEmitter,
+  eventConfig?: EventConfig,
+): string | null => {
   const [latestEvent, setLatestEvent] = useState<string | null>(null)
 
   const getCreateConfiguredEventHandler =
@@ -56,9 +38,7 @@ export function useEventLatch<TEventMap extends EventMap, TSelectedEvent extends
       if (typeof configValue === 'function') {
         return (...args: unknown[]) => {
           const result = configValue(...args)
-          if (result === true) {
-            setLatestEvent(eventName)
-          } else if (typeof result === 'string') {
+          if (typeof result === 'string') {
             setLatestEvent(result)
           }
         }
@@ -96,7 +76,7 @@ export function useEventLatch<TEventMap extends EventMap, TSelectedEvent extends
         } catch {
           return
         }
-        eventEmitter.on(eventName, listener)
+        eventEmitter.addListener(eventName, listener)
         return { eventName, listener }
       })
       .filter(
