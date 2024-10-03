@@ -2,7 +2,8 @@ import { EventEmitter } from 'events'
 import { useEffect, useState } from 'react'
 
 export type EventHandler = (...args: unknown[]) => string
-export type EventConfig = string[] | Record<string, EventHandler | string>
+type EventConfigRecord = Record<string, string | EventHandler>
+type EventConfigRecordNameAccumulator<T> = T extends Record<string, infer U> ? U extends string ? U : U extends EventHandler ? ReturnType<U> : never : never
 
 /**
  * Register listeners on an EventEmitter to derive state from the emitted events.
@@ -20,36 +21,36 @@ export type EventConfig = string[] | Record<string, EventHandler | string>
  * Function values are called with the emitted args (as if directly registered as a listener for the event).
  * @returns the latest emitted event name, or a value derived from the emitted event and args according to the {@link eventConfig}
  */
-export const useEventLatch = (
+export const useEventLatch = <T extends EventConfigRecord | string[]>(
   eventEmitter: EventEmitter,
-  eventConfig?: EventConfig,
-): string | null => {
-  const [latestEvent, setLatestEvent] = useState<string | null>(null)
+  eventConfig?: T,
+): (T extends string[] ? T[number] : EventConfigRecordNameAccumulator<T>) | null => {
+  const [latestEvent, setLatestEvent] = useState<(T extends string[] ? T[number] : EventConfigRecordNameAccumulator<T>) | null>(null)
 
   const getCreateConfiguredEventHandler =
-    (definedEventConfig: Exclude<NonNullable<typeof eventConfig>, string[]>) =>
-    (eventName: string) => {
-      const configValue = definedEventConfig[eventName]
-      if (typeof configValue === 'string') {
-        return createUnconfiguredEventHandler(eventName)
-      }
+    (definedEventConfig: EventConfigRecord) =>
+      (eventName: string) => {
+        const configValue = definedEventConfig[eventName]
+        if (typeof configValue === 'string') {
+          return createUnconfiguredEventHandler(eventName)
+        }
 
-      if (typeof configValue === 'function') {
-        return (...args: unknown[]) => {
-          const result = configValue(...args)
-          if (typeof result === 'string') {
-            setLatestEvent(result)
+        if (typeof configValue === 'function') {
+          return (...args: unknown[]) => {
+            const result = configValue(...args)
+            if (typeof result === 'string') {
+              setLatestEvent(result as typeof latestEvent)
+            }
           }
         }
+
+        throw new Error(
+          `Unexpected config value for event name '${eventName}'. Config value: ${JSON.stringify(configValue)}`,
+        )
       }
 
-      throw new Error(
-        `Unexpected config value for event name '${eventName}'. Config value: ${JSON.stringify(configValue)}`,
-      )
-    }
-
   const createUnconfiguredEventHandler = (eventName: string) => () => {
-    setLatestEvent(eventName)
+    setLatestEvent(eventName as typeof latestEvent)
   }
 
   useEffect(() => {
@@ -81,7 +82,7 @@ export const useEventLatch = (
       .filter(
         (
           listenerIfValid,
-        ): listenerIfValid is NonNullable<typeof listenerIfValid> =>
+        ) =>
           !!listenerIfValid,
       )
 
