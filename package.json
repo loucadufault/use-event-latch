@@ -1,6 +1,6 @@
 {
   "name": "use-event-latch",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React hook to derive state from events emitted by an EventEmitter",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/wrapper.mjs",
@@ -47,7 +47,7 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-prettier": "^5.2.1",
     "prettier": "^3.3.3",
-    "typescript": "^5.4.5"
+    "typescript": "^5.6.2"
   },
   "dependencies": {
     "@types/events": "^3.0.3",
