@@ -1,6 +1,6 @@
 {
   "name": "use-event-latch",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React hook to derive state from events emitted by an EventEmitter",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/wrapper.mjs",
